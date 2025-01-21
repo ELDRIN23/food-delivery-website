@@ -1,0 +1,118 @@
+import User from '../models/userModel.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+import tokenGenerator from '../utils/token.js';
+
+export const userRegister = async (req, res, next) => {
+    try {
+        const { name, address, email, password, phone, profilePic } = req.body;
+
+        if (!name || !address || !email || !password || !phone) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const isUserExist = await User.findOne({ email });
+        if (isUserExist) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        const userData = new User({ name, address, email, password: hashedPassword, phone, profilePic });
+        await userData.save();
+
+        const token = tokenGenerator(userData._id);
+        res.cookie("token", token);
+
+        return res.json({ data: userData, message: "User account created" });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+    }
+};
+
+export const userSignin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const UserExist = await User.findOne({ email });
+        if (!UserExist) {
+            return res.status(404).json({ message: "User does not exist" });
+        }
+
+        const passwordMatch = bcrypt.compareSync(password, UserExist.password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+
+        const token = tokenGenerator(UserExist._id);
+        res.cookie("token", token);
+
+        return res.json({ data: UserExist, message: "User signin success" });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+    }
+};
+
+export const userProfile = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const userData = await User.findById(userId).select("-password");
+        return res.json({ data: userData, message: "User profile found" });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+    }
+};
+
+export const userLogout = async (req, res, next) => {
+    try {
+        res.clearCookie("token");
+
+        return res.json({ message: "User logout success" });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+    }
+};
+
+export const updateUserProfile = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const { name, address, phone, profilePic, password } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (name) user.name = name;
+        if (address) user.address = address;
+        if (phone) user.phone = phone;
+        if (profilePic) user.profilePic = profilePic;
+
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            user.password = hashedPassword;
+        }
+
+        await user.save();
+
+        return res.status(200).json({ message: "User profile updated successfully", data: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
+};
+
+// export {
+   
+//     userSignin,
+//     userProfile,
+//     userLogout,
+//     updateUserProfile
+// };
