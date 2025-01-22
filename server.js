@@ -8,17 +8,21 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3000; // Use environment variable or fallback to 3000
 
 // Middleware
-app.use(express.json());
-app.use(cookieParser());
+
+// app.use(cookieParser());
 
 // Connect to Database
 connectDB();
 
 // Routes
 app.use("/api", apiRouter);
+
+
 
 // Test Route
 app.get("/", (req, res) => {
