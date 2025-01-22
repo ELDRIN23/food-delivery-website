@@ -1,23 +1,26 @@
 import jwt from "jsonwebtoken";
 
-export const userAuth = (req, res, next) => {
+ const userAuth = (req, res, next) => {
     try {
-        const { token } = req.cookies;
+        const token = req.cookies.token; // Extract token from cookies
 
         if (!token) {
-            return res.status(401).json({ message: "user not autherised", success: false });
+            return res.status(401).json({ message: "User not authorized", success: false });
         }
 
+        // Verify the token using the secret key
         const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        
-        if (!tokenVerified) {
-            return res.status(401).json({ message: "user not autherised", success: false });
-        }
 
+        // Attach user details to the request object
         req.user = tokenVerified;
 
         next();
     } catch (error) {
-        return res.status(401).json({ message: error.message || "user autherization failed", success: false });
+        return res.status(401).json({ 
+            message: error.message || "User authorization failed", 
+            success: false 
+        });
     }
 };
+
+export{userAuth as userAthmiddleware };

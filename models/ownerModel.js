@@ -12,4 +12,4 @@ const restaurantOwnerSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
   });
 
-export const Owner = mongoose.model('Owner', OwnerSchema);
+export const Owner = mongoose.model('Owner', restaurantOwnerSchema);

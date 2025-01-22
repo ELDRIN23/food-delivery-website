@@ -1,10 +1,8 @@
-import User from '../models/userModel.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import User from "../models/userModel.js";
+import bcrypt from "bcrypt";
+import { generateToken } from "../utils/token.js"; // Correct import statement
 
-import tokenGenerator from '../utils/token.js';
-
-export const userRegister = async (req, res, next) => {
+export const userRegister = async (req, res) => {
     try {
         const { name, address, email, password, phone, profilePic } = req.body;
 
@@ -12,26 +10,26 @@ export const userRegister = async (req, res, next) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const isUserExist = await User.findOne({ email });
-        if (isUserExist) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        const hashedPassword = bcrypt.hashSync(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ name, address, email, password: hashedPassword, phone, profilePic });
+        await user.save();
 
-        const userData = new User({ name, address, email, password: hashedPassword, phone, profilePic });
-        await userData.save();
+        const token = generateToken(user._id);
 
-        const token = tokenGenerator(userData._id);
         res.cookie("token", token);
 
-        return res.json({ data: userData, message: "User account created" });
+        res.status(201).json({ message: "User registered successfully", user });
     } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+        res.status(500).json({ message: error.message });
     }
 };
 
-export const userSignin = async (req, res, next) => {
+export const userSignin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -39,57 +37,43 @@ export const userSignin = async (req, res, next) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const UserExist = await User.findOne({ email });
-        if (!UserExist) {
-            return res.status(404).json({ message: "User does not exist" });
-        }
-
-        const passwordMatch = bcrypt.compareSync(password, UserExist.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "User not authenticated" });
-        }
-
-        const token = tokenGenerator(UserExist._id);
-        res.cookie("token", token);
-
-        return res.json({ data: UserExist, message: "User signin success" });
-    } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
-    }
-};
-
-export const userProfile = async (req, res, next) => {
-    try {
-        const userId = req.user.id;
-
-        const userData = await User.findById(userId).select("-password");
-        return res.json({ data: userData, message: "User profile found" });
-    } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
-    }
-};
-
-export const userLogout = async (req, res, next) => {
-    try {
-        res.clearCookie("token");
-
-        return res.json({ message: "User logout success" });
-    } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
-    }
-};
-
-export const updateUserProfile = async (req, res, next) => {
-    try {
-        const userId = req.user.id;
-
-        const { name, address, phone, profilePic, password } = req.body;
-
-        const user = await User.findById(userId);
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const token = generateToken(user._id);
+        res.cookie("token", token);
+
+        res.status(200).json({ message: "Signin successful", user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const userLogout = (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logout successful" });
+};
+
+export const userProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        res.status(200).json({ user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateUserProfile = async (req, res) => {
+    try {
+        const { name, address, phone, profilePic, password } = req.body;
+        const user = await User.findById(req.user.id);
 
         if (name) user.name = name;
         if (address) user.address = address;
@@ -97,22 +81,12 @@ export const updateUserProfile = async (req, res, next) => {
         if (profilePic) user.profilePic = profilePic;
 
         if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            user.password = hashedPassword;
+            user.password = await bcrypt.hash(password, 10);
         }
 
         await user.save();
-
-        return res.status(200).json({ message: "User profile updated successfully", data: user });
+        res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
+        res.status(500).json({ message: error.message });
     }
 };
-
-// export {
-   
-//     userSignin,
-//     userProfile,
-//     userLogout,
-//     updateUserProfile
-// };

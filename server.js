@@ -1,33 +1,31 @@
-// const express = require('express')
-import express, { Router } from "express"
+import express from "express";
 import { connectDB } from "./config/db.js";
-import { apiRouter } from "./routes/index.js";
+import {apiRouter} from "./routes/index.js"; // Ensure this is exported correctly in your routes file
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+//import {apiRouter}from "./routes/userRoutes.js"
 
+dotenv.config();
 
-Router.use(cookieParser());
+const app = express();
+const port = process.env.PORT || 3000; // Use environment variable or fallback to 3000
 
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
 
-const app = express()
-app.use(express.json())
-const port = 3000 
+// Connect to Database
+connectDB();
 
-connectDB()
-
+// Routes
 app.use("/api", apiRouter);
 
-app.get('/', (req, res) => {
-  res.send('Hello Worldd!')
-})
+// Test Route
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
-
-
-// app.get('/api', (req, res) => {
-//   res.send('eldrin')
-// })
-
-
-
+// Start the Server
 app.listen(port, () => {
-  console.log(` app listening on port ${port}`)
-})
+  console.log(`App listening on port ${port}`);
+});

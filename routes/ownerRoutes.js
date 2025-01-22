@@ -1,21 +1,32 @@
 import e from "express";
+import {restaurantownerAuth}from "../middlewares/ownerAuth.js"
+import {
+    restaurantownerRegister,
+    restaurantownerLogin,
+    restaurantownerProfile,
+    restaurantownerLogout,
+    updateRestaurantownerProfile
+} from "../controllers/ownerControllers.js"
+
 
 const router = e.Router();
 
 //Register
-restaurantownerRouter.post('/signup', restaurantownerRegister);
+router.post('/register', restaurantownerRegister);
 
 //Signin
-restaurantownerRouter.put('/login', restaurantownerlogin);
+router.put('/login',restaurantownerLogin);
 
 //Logout
-restaurantownerRouter.get('/logout', restaurantownerAuth, restaurantownerLogout);
+router.get('/logout', restaurantownerAuth,restaurantownerLogout);
 
 //Profile
-restaurantownerRouter.get('/profile',  restaurantownerAuth, restaurantownerProfile)
+router.get('/profile',  restaurantownerAuth, restaurantownerProfile)
 
 
 //Updateprofile
-restaurantownerRouter.get('/updateprofile', restaurantownerAuth,updaterestaurantownerProfile );
+router.get('/updateprofile', restaurantownerAuth, updateRestaurantownerProfile );
+
+
 export { router as ownerRouter };
 

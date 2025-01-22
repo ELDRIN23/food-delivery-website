@@ -8,9 +8,7 @@ const AdminSchema = new mongoose.Schema({
     profilepic: { type: String, default: "https://tse1.mm.bing.net/th?id=OIP.w-L3HP_7QYalYXw7apT2tAHaHx&pid=Api&P=0&h=180" },
     phone: { type: String, required: true },
     isActive: { type: Boolean, default: true },
-    qualification: { type: String },
-    experience: { type: String, required: true },
-    role: { type: String, enum: ["admin", "developer"] },
+    role: { type: String, enum: ["admin", "owner"] },
 });
 
 export const Admin = mongoose.model("Admin", AdminSchema);
