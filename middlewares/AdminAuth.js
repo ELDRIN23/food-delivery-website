@@ -10,11 +10,12 @@ const adminAuth = (req, res, next) => {
 
         // Verify the token using the secret key
         const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+       // console.log(tokenVerified)
 
         // Check if the user's role is admin
-        if (tokenVerified.role !== "admin") {
-            return res.status(403).json({ message: "Access denied. Admins only.", success: false });
-        }
+        //if (tokenVerified.role !== "admin") {
+       //     return res.status(403).json({ message: "Access denied. Admins only.", success: false });
+       // }
 
         // Attach user details to the request object
         req.user = tokenVerified;

@@ -2,7 +2,6 @@ import express from "express";
 import { userRegister, userSignin, userLogout, userProfile, updateUserProfile } from "../controllers/userControllers.js";
 import {  userAthmiddleware } from "../middlewares/userAuth.js"; 
 
-
 const router = express.Router();
 
 // Register
@@ -15,9 +14,9 @@ router.post('/signin', userSignin);
 router.get('/logout',  userAthmiddleware, userLogout);
 
 // Profile
-router.get('/profile',  userAthmiddleware, userProfile);
+router.get('/profile', userAthmiddleware, userProfile);
 
 // Update Profile
-router.put('/updateprofile',  userAthmiddleware, updateUserProfile);
+router.put('/updateprofile', userAthmiddleware, updateUserProfile);
 
 export {router as userRouter};

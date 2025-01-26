@@ -2,23 +2,25 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {generateToken} from '../utils/token.js';
+import { Owner } from '../models/ownerModel.js';
 
 export const restaurantownerRegister = async (req, res, next) => {
-    try {
-        const { name, address, email, password, phone, profilePic, role } = req.body;
 
-        if (!name || !address || !email || !password || !phone || !role) {
+    try {
+        const { name, address, email, password, phone, } = req.body;
+
+        if (!name || !address || !email || !password || !phone ) {
             return res.status(400).json({ message: "All fields are required", success: false });
         }
 
-        const isperson = await Restaurantowner.findOne({ email });
+        const isperson = await Owner.findOne({ email });
         if (isperson) {
             return res.status(400).json({ message: "Person already exists", success: false });
         }
 
         const hashedPassword = bcrypt.hashSync(password, 10);
 
-        const personData = new Restaurantowner({ name, address, email, password: hashedPassword, phone, profilePic, role });
+        const personData = new Owner({ name, address, email, password: hashedPassword, phone});
         await personData.save();
 
         const token = generateToken(personData._id, personData.role);
@@ -42,7 +44,7 @@ export const restaurantownerLogin = async (req, res, next) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const userExist = await Restaurantowner.findOne({ email });
+        const userExist = await Owner.findOne({ email });
         if (!userExist) {
             return res.status(404).json({ message: "User does not exist" });
         }
@@ -55,15 +57,15 @@ export const restaurantownerLogin = async (req, res, next) => {
         const token = generateToken(userExist._id, userExist.role);
         res.cookie("token", token);
 
-        if (userExist.role === "restaurantOwner") {
-            return res.status(200).json({ data: userExist, message: "Restaurant owner logged in successfully", success: true });
-        }
+        // if (userExist.role === "restaurantOwner") {
+        //     return res.status(200).json({ data: userExist, message: "Restaurant owner logged in successfully", success: true });
+        // }
 
-        if (userExist.role === "admin") {
-            return res.status(200).json({ data: userExist, message: "Admin logged in successfully", success: true });
-        }
+        // if (userExist.role === "admin") {
+        //     return res.status(200).json({ data: userExist, message: "Admin logged in successfully", success: true });
+        // }
 
-        return res.status(403).json({ message: "Access denied. Role not recognized.", success: false });
+        // return res.status(403).json({ message: "Access denied. Role not recognized.", success: false });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
     }
@@ -74,7 +76,7 @@ export const restaurantownerProfile = async (req, res, next) => {
         const personRole = req.person.role;
         const personId = req.person.id;
 
-        const personData = await Restaurantowner.findById(personId).select("-password");
+        const personData = await Owner.findById(personId).select("-password");
 
         if (personRole === "restaurantOwner") {
             return res.status(200).json({ message: "Restaurant owner profile fetched successfully.", data: personData, success: true });
@@ -92,6 +94,10 @@ export const restaurantownerProfile = async (req, res, next) => {
 
 export const restaurantownerLogout = async (req, res, next) => {
     try {
+        const {_id}=req.body
+        if (!_id){
+          return res.json({ message: "id not found" });
+        }
         res.clearCookie("token");
         return res.json({ message: "Logout success" });
     } catch (error) {
@@ -100,33 +106,21 @@ export const restaurantownerLogout = async (req, res, next) => {
 };
 
 export const updateRestaurantownerProfile = async (req, res, next) => {
-    try {
-        const personId = req.person.id;
-        console.log("Request Body:", req.body);
-
-        const { name, address, phone, profilePic, password } = req.body;
-
-        const dealer = await Restaurantowner.findById(personId);
-        if (!dealer) {
-            return res.status(404).json({ message: "Dealer not found" });
+        try {
+            const { name, address, phone} = req.body;
+            const user = await Owner.findById(req.user.id);
+            if(!Owner){
+                res.status(400).json({ message: "user not found"});
+            }
+            if (name) user.name = name;
+            if (address) user.address = address;
+            if (phone) user.phone = phone;
+          
+            await user.save();
+            res.status(200).json({ message: "Profile updated successfully", user });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
         }
-
-        if (name) dealer.name = name;
-        if (address) dealer.address = address;
-        if (phone) dealer.phone = phone;
-        if (profilePic) dealer.profilePic = profilePic;
-
-        if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            dealer.password = hashedPassword;
-        }
-
-        await dealer.save();
-
-        return res.status(200).json({ message: "Profile updated successfully", data: dealer });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
-    }
 };
 
 

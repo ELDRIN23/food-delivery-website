@@ -1,20 +1,27 @@
-import e from "express";
+import express from "express";
+import {
+    addCoupon,
+    getAllCoupons,
+    getCouponById,
+    updateCoupon,
+    deleteCoupon,
+} from "../controllers/couponControllers.js";
 
-const router = e.Router();
+const router = express.Router();
 
-// Create a new coupon
-router.post("/create", () => {});
+// Add a new coupon
+router.post('/add', addCoupon);
 
-// Update coupon details
-router.put("/update/:id", () => {});
+// Get all coupons
+router.get('/', getAllCoupons);
 
-// Deactivate a coupon
-router.put("/deactivate/:id", () => {});
+// Get a single coupon by ID
+router.get('/:id', getCouponById);
 
-// Get coupon details by ID
-router.get("/:id", () => {});
+// Update a coupon
+router.put('/:id', updateCoupon);
 
-// Get all active coupons
-router.get("/", () => {});
+// Delete a coupon
+router.delete('/:id', deleteCoupon);
 
 export { router as couponRouter };

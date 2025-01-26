@@ -1,20 +1,27 @@
-import e from "express";
+import express from "express";
+import {
+    addDish,
+    getAllDishes,
+    getDishesByRestaurant,
+    updateDish,
+    deleteDish,
+} from "../controllers/dishesControllers.js";
 
-const router = e.Router();
+const router = express.Router();
 
 // Add a new dish
-router.post("/add", () => {});
+router.post('/add', addDish);
 
-// Update dish details
-router.put("/update/:id", () => {});
+// Get all dishes
+router.get('/', getAllDishes);
 
-// Deactivate a dish
-router.put("/deactivate/:id", () => {});
+// Get dishes by restaurant ID
+router.get('/:restaurant_id', getDishesByRestaurant);
 
-// Get dish details by ID
-router.get("/:id", () => {});
+// Update a dish
+router.put('/:id', updateDish);
 
-// Get all dishes for a restaurant
-router.get("/restaurant/:restaurant_id", () => {});
+// Delete a dish
+router.delete('/:id', deleteDish);
 
-export { router as dishesRouter };
+export {router as dishesRouter};

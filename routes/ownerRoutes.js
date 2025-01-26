@@ -18,7 +18,7 @@ router.post('/register', restaurantownerRegister);
 router.put('/login',restaurantownerLogin);
 
 //Logout
-router.get('/logout', restaurantownerAuth,restaurantownerLogout);
+router.put('/logout', restaurantownerAuth,restaurantownerLogout);
 
 //Profile
 router.get('/profile',  restaurantownerAuth, restaurantownerProfile)

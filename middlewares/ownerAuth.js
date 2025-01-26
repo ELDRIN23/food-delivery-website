@@ -17,12 +17,12 @@ const restaurantOwnerAuthMiddleware = (req, res, next) => {
         const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         // Check if the token contains a role and if the role is "restaurantOwner"
-        if (tokenVerified.role !== "restaurantOwner") {
-            return res.status(403).json({ 
-                message: "Access denied. Insufficient permissions.", 
-                success: false 
-            });
-        }
+        // if (tokenVerified.role !== "restaurantOwner") {
+        //     return res.status(403).json({ 
+        //         message: "Access denied. Insufficient permissions.", 
+        //         success: false 
+        //     });
+       // }
 
         // Attach user details to the request object
         req.user = tokenVerified;

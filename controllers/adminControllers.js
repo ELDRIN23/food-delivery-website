@@ -4,17 +4,18 @@ import { generateToken } from "../utils/token.js";
 import  {Admin} from "../models/adminModel.js"
 
 export const restaurantAdminRegister = async (req, res, next) => {
+  
   try {
-    const { name, address, email, password, phone, profilePic, role } =
+    const { name, email, phone, password } =
       req.body;
 
-    if (!name || !address || !email || !password || !phone || !role) {
+    if (!name || !email  || !phone || !password) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });
     }
 
-    const isperson = await Restaurantowner.findOne({ email });
+    const isperson = await Admin.findOne({ email });
     if (isperson) {
       return res
         .status(400)
@@ -25,19 +26,19 @@ export const restaurantAdminRegister = async (req, res, next) => {
 
     const personData = new Admin({
       name,
-      address,
+
       email,
       password: hashedPassword,
       phone,
-      profilePic,
-      role,
+  
+
     });
     await personData.save();
 
-    const token = generateToken(personData._id, personData.role);
+    const token = generateToken(personData._id);
     res.cookie("token", token);
 
-    if (personData.role === "admin") {
+   
       return res
         .status(201)
         .json({
@@ -45,15 +46,8 @@ export const restaurantAdminRegister = async (req, res, next) => {
           message: "Admin account created successfully",
           success: true,
         });
-    } else if (personData.role === "restaurantOwner") {
-      return res
-        .status(201)
-        .json({
-          data: personData,
-          message: "Restaurant owner account created successfully",
-          success: true,
-        });
-    }
+        
+
   } catch (error) {
     return res
       .status(500)
@@ -72,7 +66,7 @@ export const restaurantAdminLogin = async (req, res, next) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const userExist = await Restaurantowner.findOne({ email });
+    const userExist = await Admin.findOne({ email });
     if (!userExist) {
       return res.status(404).json({ message: "User does not exist" });
     }
@@ -85,7 +79,7 @@ export const restaurantAdminLogin = async (req, res, next) => {
     const token = generateToken(userExist._id, userExist.role);
     res.cookie("token", token);
 
-    if (userExist.role === "restaurantOwner") {
+    if (userExist.role == "restaurantOwner") {
       return res
         .status(200)
         .json({
@@ -95,7 +89,7 @@ export const restaurantAdminLogin = async (req, res, next) => {
         });
     }
 
-    if (userExist.role === "admin") {
+    if (userExist.role == "admin") {
       return res
         .status(200)
         .json({
@@ -159,6 +153,10 @@ export const restaurantAdminProfile = async (req, res, next) => {
 
 export const restaurantAdminLogout = async (req, res, next) => {
   try {
+    const {_id}=req.body
+    if (!_id){
+      return res.json({ message: "id not found" });
+    }
     res.clearCookie("token");
     return res.json({ message: "Logout success" });
   } catch (error) {
@@ -169,37 +167,21 @@ export const restaurantAdminLogout = async (req, res, next) => {
 };
 
 export const updateRestaurantAdminProfile = async (req, res, next) => {
-  try {
-    const personId = req.person.id;
-    console.log("Request Body:", req.body);
-
-    const { name, address, phone, profilePic, password } = req.body;
-
-    const dealer = await Restaurantowner.findById(personId);
-    if (!dealer) {
-      return res.status(404).json({ message: "Dealer not found" });
-    }
-
-    if (name) dealer.name = name;
-    if (address) dealer.address = address;
-    if (phone) dealer.phone = phone;
-    if (profilePic) dealer.profilePic = profilePic;
-
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      dealer.password = hashedPassword;
-    }
-
-    await dealer.save();
-
-    return res
-      .status(200)
-      .json({ message: "Profile updated successfully", data: dealer });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
-  }
+    try {
+          const { name, address, phone} = req.body;
+          const user = await Admin.findById(req.user.id);
+          if(!user){
+              res.status(400).json({ message: "user not found"});
+          }
+          if (name) user.name = name;
+          if (address) user.address = address;
+          if (phone) user.phone = phone;
+        
+          await user.save();
+          res.status(200).json({ message: "Profile updated successfully", user });
+      } catch (error) {
+          res.status(500).json({ message: error.message });
+      }
 };
 
 // export {

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const RestaurantSchema = new mongoose.Schema({
-    resturant_id: { type: String, required: true },
+   // resturant_id: { type: String, required: true },
     name: { type: String, required: true },
     images: { type: [String] },
     adders: { type: String, required: true },
@@ -13,4 +13,6 @@ const RestaurantSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: null },
 });
 
-export default  Restaurant = mongoose.model('Restaurant', RestaurantSchema);
+export default  mongoose.model('Restaurant', RestaurantSchema);
+
+

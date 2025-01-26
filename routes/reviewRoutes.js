@@ -1,20 +1,27 @@
-import e from "express";
+import express from "express";
+import {
+    addReview,
+    getReviewsByRestaurant,
+    getReviewsByUser,
+    updateReview,
+    deleteReview,
+} from "../controllers/reviewControllers.js";
 
-const router = e.Router();
+const router = express.Router();
 
 // Add a new review
-router.post("/add", () => {});
+router.post('/add', addReview);
 
-// Update review details
-router.put("/update/:id", () => {});
+// Get reviews for a specific restaurant
+router.get('/restaurant/:restaurant_id', getReviewsByRestaurant);
+
+// Get reviews by a specific user
+router.get('/user/:user_id', getReviewsByUser);
+
+// Update a review
+router.put('/:id', updateReview);
 
 // Delete a review
-router.delete("/delete/:id", () => {});
-
-// Get review details by ID
-router.get("/:id", () => {});
-
-// Get all reviews for a restaurant
-router.get("/restaurant/:restaurant_id", () => {});
+router.delete('/:id', deleteReview);
 
 export { router as reviewRouter };

@@ -73,18 +73,15 @@ export const userProfile = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
     try {
-        const { name, address, phone, profilePic, password } = req.body;
+        const { name, address, phone} = req.body;
         const user = await User.findById(req.user.id);
-
+        if(!User){
+            res.status(400).json({ message: "user not found"});
+        }
         if (name) user.name = name;
         if (address) user.address = address;
         if (phone) user.phone = phone;
-        if (profilePic) user.profilePic = profilePic;
-
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
-        }
-
+      
         await user.save();
         res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {

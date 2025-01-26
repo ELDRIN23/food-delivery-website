@@ -1,21 +1,28 @@
-import e from "express";
+import express from "express";
+import {
+    addRestaurant,
+    getAllRestaurants,
+    getRestaurantById,
+    updateRestaurant,
+    deleteRestaurant,
+} from "../controllers/resturantControllers.js";
 
-const router = e.Router();
+const router = express.Router();
 
 // Add a new restaurant
-router.post("/add", () => {});
-
-// Update restaurant details
-router.put("/update/:id", () => {});
-
-// Deactivate a restaurant
-router.put("/deactivate/:id", () => {});
-
-// Get restaurant details by ID
-router.get("/:id", () => {});
+router.post('/add', addRestaurant);
 
 // Get all restaurants
-router.get("/", () => {});
+router.get('/', getAllRestaurants);
 
-export { router as restaurantRouter };
+// Get a single restaurant by ID
+router.get('/:id', getRestaurantById);
+
+// Update a restaurant
+router.put('/:id', updateRestaurant);
+
+// Delete a restaurant
+router.delete('/:id', deleteRestaurant);
+
+export {router as restaurantRouter};
 
