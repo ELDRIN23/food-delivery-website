@@ -3,10 +3,9 @@ import { Coupon } from "../models/couponModel.js";
 // Add a new coupon
 export const addCoupon = async (req, res) => {
     try {
-        const { id, discount_value, amount, user_limit, expiry_date } = req.body;
+        const { discount_value, amount, user_limit, expiry_date } = req.body;
 
         const newCoupon = new Coupon({
-            id,
             discount_value,
             amount,
             user_limit,

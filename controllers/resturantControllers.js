@@ -3,14 +3,13 @@ import Restaurant from "../models/resturantModel.js";
 // Add a new restaurant
 export const addRestaurant = async (req, res) => {
     try {
-        const { resturant_id, name, images, adders, phone_no, rating, menu, operating_hours } = req.body;
+        const { name, images, adders, phone, rating, menu, operating_hours } = req.body;
 
         const newRestaurant = new Restaurant({
-            resturant_id,
             name,
             images,
             adders,
-            phone_no,
+            phone,
             rating,
             menu,
             operating_hours,

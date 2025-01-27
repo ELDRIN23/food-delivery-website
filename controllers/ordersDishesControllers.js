@@ -3,10 +3,9 @@ import { OrderedDishes } from "../models/odersDishesModel.js";
 // Add a new ordered dish
 export const addOrderedDish = async (req, res) => {
     try {
-        const { ordered_id, user_id, dish_id, resturant_id, image, dish_name, availability, adders, total_amount, status, phone_no } = req.body;
+        const { user_id, dish_id, resturant_id, image, dish_name, availability, adders, total_amount, status, phone_no } = req.body;
 
         const newOrderedDish = new OrderedDishes({
-            ordered_id,
             user_id,
             dish_id,
             resturant_id,
