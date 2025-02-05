@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const CouponSchema = new mongoose.Schema({
-    id: { type: String, required: true },
+    //id: { type: String, required: true },
     discount_value: { type: String, required: true },
     amount: { type: Number, required: true },
     user_limit: { type: String },

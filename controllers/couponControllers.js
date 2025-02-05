@@ -32,7 +32,7 @@ export const getAllCoupons = async (req, res) => {
 // Get a single coupon by ID
 export const getCouponById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
 
         const coupon = await Coupon.findOne({ id });
         if (!coupon) return res.status(404).json({ error: "Coupon not found" });
@@ -46,7 +46,7 @@ export const getCouponById = async (req, res) => {
 // Update coupon details
 export const updateCoupon = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const updates = req.body;
 
         const updatedCoupon = await Coupon.findOneAndUpdate(
@@ -66,7 +66,7 @@ export const updateCoupon = async (req, res) => {
 // Delete a coupon
 export const deleteCoupon = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
 
         const deletedCoupon = await Coupon.findOneAndDelete({ id });
         if (!deletedCoupon) return res.status(404).json({ error: "Coupon not found" });

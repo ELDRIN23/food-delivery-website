@@ -20,10 +20,15 @@ export const restaurantownerRegister = async (req, res, next) => {
 
         const hashedPassword = bcrypt.hashSync(password, 10);
 
-        const personData = new Owner({ name, address, email, password: hashedPassword, phone});
+        const personData = new Owner({ name, address, email, password: hashedPassword, phone, role:"restaurantOwner"});
         await personData.save();
 
+        console.log(personData.role);
+        
         const token = generateToken(personData._id, personData.role);
+
+        console.log(token);
+        
         res.cookie("token", token);
 
         if (personData.role === "admin") {
@@ -55,6 +60,8 @@ export const restaurantownerLogin = async (req, res, next) => {
         }
 
         const token = generateToken(userExist._id, userExist.role);
+        console.log(token);
+        
         res.cookie("token", token);
 
         // if (userExist.role === "restaurantOwner") {
@@ -73,8 +80,14 @@ export const restaurantownerLogin = async (req, res, next) => {
 
 export const restaurantownerProfile = async (req, res, next) => {
     try {
-        const personRole = req.person.role;
-        const personId = req.person.id;
+
+
+       const token = req.cookies.token
+       const tokenData = jwt.decode(token);
+
+       
+       const personRole = tokenData.role;
+       const personId = tokenData.id;
 
         const personData = await Owner.findById(personId).select("-password");
 

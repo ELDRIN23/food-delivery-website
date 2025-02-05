@@ -23,7 +23,7 @@ export const addReview = async (req, res) => {
 // Get all reviews for a specific restaurant
 export const getReviewsByRestaurant = async (req, res) => {
     try {
-        const { restaurant_id } = req.params;
+        const { restaurant_id } = req.body;
 
         const reviews = await Review.find({ restaurant_id });
         if (reviews.length === 0) return res.status(404).json({ error: "No reviews found for this restaurant" });
@@ -37,7 +37,7 @@ export const getReviewsByRestaurant = async (req, res) => {
 // Get reviews by user ID
 export const getReviewsByUser = async (req, res) => {
     try {
-        const { user_id } = req.params;
+        const { user_id } = req.body;
 
         const reviews = await Review.find({ user_id });
         if (reviews.length === 0) return res.status(404).json({ error: "No reviews found for this user" });
@@ -51,7 +51,7 @@ export const getReviewsByUser = async (req, res) => {
 // Update a review
 export const updateReview = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const updates = req.body;
 
         const updatedReview = await Review.findByIdAndUpdate(
@@ -71,7 +71,7 @@ export const updateReview = async (req, res) => {
 // Delete a review
 export const deleteReview = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
 
         const deletedReview = await Review.findByIdAndDelete(id);
         if (!deletedReview) return res.status(404).json({ error: "Review not found" });

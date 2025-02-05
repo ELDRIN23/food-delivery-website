@@ -7,23 +7,34 @@ export const addItemToCart = async (req, res) => {
     try {
         const { user_id, dish_id, dish_name, quantity, price_per_item } = req.body;
 
-        const total_amount = quantity * price_per_item;
+        // Find the cart for the user
+        let cart = await Cart.findOne({ user_id });
 
-        // Check if the item already exists in the cart
-        let cartItem = await Cart.findOne({ user_id, dish_id });
-        if (cartItem) {
-            // Update existing item's quantity and total amount
-            cartItem.quantity += quantity;
-            cartItem.total_amount += total_amount;
-            await cartItem.save();
-            return res.status(200).json(cartItem);
+        if (cart) {
+            // Check if the dish already exists in the cart
+            const dishIndex = cart.dishes.findIndex(dish => dish.dish_id.toString() === dish_id);
+
+            if (dishIndex > -1) {
+                // Update existing dish's quantity and price
+                cart.dishes[dishIndex].quantity += quantity;
+                cart.dishes[dishIndex].price_per_item = price_per_item; // Update the price if needed
+            } else {
+                // Add new dish to the cart
+                cart.dishes.push({ dish_id, dish_name, quantity, price_per_item });
+            }
+        } else {
+            // Create a new cart for the user
+            cart = new Cart({
+                user_id,
+                dishes: [{ dish_id, dish_name, quantity, price_per_item }],
+            });
         }
 
-        // Add a new item to the cart
-        cartItem = new Cart({ user_id, dish_id, dish_name, quantity, price_per_item, total_amount });
-        await cartItem.save();
+        // Calculate the total_amount
+        cart.total_amount = cart.dishes.reduce((sum, dish) => sum + dish.quantity * dish.price_per_item, 0);
+        await cart.save();
 
-        res.status(201).json(cartItem);
+        res.status(201).json(cart);
     } catch (error) {
         res.status(500).json({ error: "Failed to add item to the cart.", details: error.message });
     }
@@ -34,9 +45,14 @@ export const addItemToCart = async (req, res) => {
  */
 export const getCartItems = async (req, res) => {
     try {
-        const user_id = req.user._id; // Logged-in user ID
-        const cartItems = await Cart.find({ user_id });
-        res.status(200).json(cartItems);
+        const user_id = req.body.user_id; // Logged-in user ID
+        const cart = await Cart.findOne({ user_id });
+
+        if (!cart) {
+            return res.status(404).json({ error: "Cart not found." });
+        }
+
+        res.status(200).json(cart);
     } catch (error) {
         res.status(500).json({ error: "Failed to retrieve cart items.", details: error.message });
     }
@@ -47,22 +63,27 @@ export const getCartItems = async (req, res) => {
  */
 export const updateCartItem = async (req, res) => {
     try {
-        const { itemId } = req.params;
-        const { quantity, price_per_item } = req.body;
+        const { user_id, dish_id, quantity, price_per_item } = req.body;
 
-        const total_amount = quantity * price_per_item;
-
-        const updatedItem = await Cart.findByIdAndUpdate(
-            itemId,
-            { quantity, total_amount, updatedAt: new Date() },
-            { new: true }
-        );
-
-        if (!updatedItem) {
-            return res.status(404).json({ error: "Cart item not found." });
+        const cart = await Cart.findOne({ user_id });
+        if (!cart) {
+            return res.status(404).json({ error: "Cart not found." });
         }
 
-        res.status(200).json(updatedItem);
+        const dishIndex = cart.dishes.findIndex(dish => dish.dish_id.toString() === dish_id);
+        if (dishIndex === -1) {
+            return res.status(404).json({ error: "Dish not found in cart." });
+        }
+
+        cart.dishes[dishIndex].quantity = quantity;
+        cart.dishes[dishIndex].price_per_item = price_per_item; // Update the price if needed
+
+        // Calculate the total_amount
+        cart.total_amount = cart.dishes.reduce((sum, dish) => sum + dish.quantity * dish.price_per_item, 0);
+        cart.updatedAt = new Date();
+
+        await cart.save();
+        res.status(200).json(cart);
     } catch (error) {
         res.status(500).json({ error: "Failed to update cart item.", details: error.message });
     }
@@ -73,14 +94,21 @@ export const updateCartItem = async (req, res) => {
  */
 export const removeCartItem = async (req, res) => {
     try {
-        const { itemId } = req.params;
+        const { user_id, dish_id } = req.body;
 
-        const deletedItem = await Cart.findByIdAndDelete(itemId);
-        if (!deletedItem) {
-            return res.status(404).json({ error: "Cart item not found." });
+        const cart = await Cart.findOne({ user_id });
+        if (!cart) {
+            return res.status(404).json({ error: "Cart not found." });
         }
 
-        res.status(200).json({ message: "Item removed from cart.", deletedItem });
+        cart.dishes = cart.dishes.filter(dish => dish.dish_id.toString() !== dish_id);
+
+        // Calculate the total_amount
+        cart.total_amount = cart.dishes.reduce((sum, dish) => sum + dish.quantity * dish.price_per_item, 0);
+        cart.updatedAt = new Date();
+
+        await cart.save();
+        res.status(200).json({ message: "Item removed from cart.", cart });
     } catch (error) {
         res.status(500).json({ error: "Failed to remove cart item.", details: error.message });
     }
@@ -91,9 +119,12 @@ export const removeCartItem = async (req, res) => {
  */
 export const clearCart = async (req, res) => {
     try {
-        const user_id = req.user._id; // Logged-in user ID
+        const user_id = req.body.user_id; // Logged-in user ID
 
-        await Cart.deleteMany({ user_id });
+        await Cart.findOneAndUpdate(
+            { user_id },
+            { dishes: [], total_amount: 0, updatedAt: new Date() }
+        );
         res.status(200).json({ message: "Cart cleared." });
     } catch (error) {
         res.status(500).json({ error: "Failed to clear cart.", details: error.message });

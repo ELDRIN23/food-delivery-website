@@ -30,12 +30,12 @@ export const restaurantAdminRegister = async (req, res, next) => {
       email,
       password: hashedPassword,
       phone,
-  
+      role:"admin"
 
     });
     await personData.save();
 
-    const token = generateToken(personData._id);
+    const token = generateToken(personData._id, personData.role);
     res.cookie("token", token);
 
    

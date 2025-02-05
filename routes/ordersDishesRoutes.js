@@ -1,20 +1,23 @@
-import e from "express";
+import express from "express";
+import {
+    addOrderedDish,
+    getAllOrderedDishes,
+    getOrderedDishesByUser,
+    getOrderedDishesByRestaurant,
+    updateOrderedDishStatus,
+    deleteOrderedDish
+} from "../controllers/ordersDishesControllers.js";
 
-const router = e.Router();
+const router = express.Router();
 
-// Place a new order
-router.post("/place", () => {});
+router.post("/ordered-dishes", addOrderedDish);
+router.get("/ordered-dishes", getAllOrderedDishes);
+router.get("/ordered-dishes/user/:user_id", getOrderedDishesByUser);
+router.get("/ordered-dishes/restaurant/:resturant_id", getOrderedDishesByRestaurant);
+router.put("/ordered-dishes/:ordered_id", updateOrderedDishStatus);
+router.delete("/ordered-dishes/:ordered_id", deleteOrderedDish);
 
-// Update order status
-router.put("/update/:id", () => {});
+export default router;
 
-// Cancel an order
-router.put("/cancel/:id", () => {});
-
-// Get order details by ID
-router.get("/:id", () => {});
-
-// Get all orders for a user
-router.get("/user/:user_id", () => {});
 
 export { router as orderedDishesRouter };

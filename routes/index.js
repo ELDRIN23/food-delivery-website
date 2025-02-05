@@ -20,6 +20,6 @@ router.use("/orderDishes",orderedDishesRouter)
 router.use("/dishes",dishesRouter)
 router.use("/coupon",couponRouter)
 router.use("/cart",cartRouter)
-router.use("/Admin",adminRouter)
+router.use("/admin",adminRouter)
 
 export{router as apiRouter};

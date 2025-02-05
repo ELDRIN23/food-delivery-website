@@ -3,19 +3,17 @@ import { OrderedDishes } from "../models/odersDishesModel.js";
 // Add a new ordered dish
 export const addOrderedDish = async (req, res) => {
     try {
-        const { user_id, dish_id, resturant_id, image, dish_name, availability, adders, total_amount, status, phone_no } = req.body;
+   // console.log("test");
+    
+        const { user_id, dish_id, resturant_id, dish_name, total_amount, phone } = req.body;
 
         const newOrderedDish = new OrderedDishes({
             user_id,
             dish_id,
             resturant_id,
-            image,
             dish_name,
-            availability,
-            adders,
             total_amount,
-            status,
-            phone_no,
+            phone,
         });
 
         await newOrderedDish.save();
@@ -91,4 +89,8 @@ export const deleteOrderedDish = async (req, res) => {
         const deletedOrderedDish = await OrderedDishes.findOneAndDelete({ ordered_id });
         if (!deletedOrderedDish) return res.status(404).json({ error: "Ordered dish not found" });
 
-        
+        res.status(200).json({ message: "Ordered dish deleted successfully", deletedOrderedDish });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete ordered dish", details: error.message });
+    }
+};
