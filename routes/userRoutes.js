@@ -1,11 +1,12 @@
 import express from "express";
 import { userRegister, userSignin, userLogout, userProfile, updateUserProfile } from "../controllers/userControllers.js";
 import {  userAthmiddleware } from "../middlewares/userAuth.js"; 
+import { upload } from "../middlewares/multer.js";
 
 const router = express.Router();
 
 // Register
-router.post('/register', userRegister);
+router.post('/register',upload.single("image"), userRegister);
 
 // Signin
 router.post('/signin', userSignin);

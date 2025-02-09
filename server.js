@@ -3,17 +3,26 @@ import { connectDB } from "./config/db.js";
 import {apiRouter} from "./routes/index.js"; // Ensure this is exported correctly in your routes file
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import bodyParser from "body-parser";
+import cors from 'cors';
+import { cloudinaryInstance } from "./config/cloudinaryConfig.js";
 //import {apiRouter}from "./routes/userRoutes.js"
-
-dotenv.config();
-
 const app = express();
+dotenv.config();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.json());
 
 const port = process.env.PORT || 3001; // Use environment variable or fallback to 3000
 
 
 app.use(cookieParser());
+app.use(cors({
+  origin:"http://localhost:5173",
+  methods:["GET","PUT","POST","DELETE","OPTIONS"],
+  credentials:true,
+}));
 
 // Connect to Database
 connectDB();

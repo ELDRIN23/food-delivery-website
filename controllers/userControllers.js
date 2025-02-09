@@ -3,11 +3,13 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../utils/token.js"; 
 
 
+
 export const userRegister = async (req, res) => {
     try {
-        const { name, address, email, password, phone, profilePic } = req.body;
+        const { name, address, email, password, phone, profilePic, role = 'user' } = req.body;
 
-        if (!name || !address || !email || !password || !phone) {
+
+        if (!name || !address || !email || !password || !phone || role) {
             return res.status(400).json({ message: "All fields are required" });
         }
 

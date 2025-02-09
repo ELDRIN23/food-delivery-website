@@ -1,13 +1,27 @@
 import Restaurant from "../models/resturantModel.js";
+import { createCookies } from "../utils/cookies.js";
+import { generateToken } from "../utils/token.js";
+import { cloudinaryInstance } from "../config/cloudinaryConfig.js";
 
 // Add a new restaurant
 export const addRestaurant = async (req, res) => {
     try {
-        const { name, images, adders, phone, rating, menu, operating_hours } = req.body;
+        const { name, adders, phone, rating, menu, operating_hours } = req.body;
+
+        let imageUrl = "";
+        if (req.file) {
+            const cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+            imageUrl = cloudinaryResponse.secure_url;
+        }
+
+        const existingRestaurant = await Restaurant.findOne({ name });
+        if (existingRestaurant) {
+            return res.status(400).json({ error: "Name already exists" });
+        }
 
         const newRestaurant = new Restaurant({
             name,
-            images,
+            image: imageUrl,
             adders,
             phone,
             rating,
@@ -16,6 +30,10 @@ export const addRestaurant = async (req, res) => {
         });
 
         await newRestaurant.save();
+
+        const token = generateToken(newRestaurant._id);
+        createCookies(res, token);
+
         res.status(201).json({ message: "Restaurant added successfully", restaurant: newRestaurant });
     } catch (error) {
         res.status(500).json({ error: "Failed to add restaurant", details: error.message });
@@ -37,7 +55,7 @@ export const getRestaurantById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const restaurant = await Restaurant.findOne({ resturant_id: id });
+        const restaurant = await Restaurant.findById(id);
         if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
 
         res.status(200).json(restaurant);
@@ -52,9 +70,15 @@ export const updateRestaurant = async (req, res) => {
         const { id } = req.params;
         const updates = req.body;
 
-        const updatedRestaurant = await Restaurant.findOneAndUpdate(
-            { resturant_id: id },
-            { ...updates, updatedAt: new Date() },
+        let imageUrl = updates.image;
+        if (req.file) {
+            const cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+            imageUrl = cloudinaryResponse.secure_url;
+        }
+
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+            id,
+            { ...updates, image: imageUrl, updatedAt: new Date() },
             { new: true }
         );
 
@@ -71,7 +95,7 @@ export const deleteRestaurant = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const deletedRestaurant = await Restaurant.findOneAndDelete({ resturant_id: id });
+        const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
         if (!deletedRestaurant) return res.status(404).json({ error: "Restaurant not found" });
 
         res.status(200).json({ message: "Restaurant deleted successfully", restaurant: deletedRestaurant });

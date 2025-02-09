@@ -25,7 +25,7 @@ const restaurantOwnerAuthMiddleware = (req, res, next) => {
         console.log(tokenVerified);
         
         // Check if the token contains a role and if the role is "restaurantOwner"
-        if (tokenVerified.role !== "restaurantOwner") {
+        if (tokenVerified.role !== 'owner' ) {
             return res.status(403).json({ 
                 message: "Access denied. Insufficient permissions.", 
                 success: false 

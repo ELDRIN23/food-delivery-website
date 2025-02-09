@@ -5,7 +5,7 @@ const restaurantOwnerSchema = new mongoose.Schema({
     address: {type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['restaurantOwner', 'admin'], default: 'restaurantOwner' },
+    role: { type: String, enum: ['Owner', 'admin'], default: 'Owner' },
     phone: {type: String, required: true},
     profilePic:{type: String ,default:" " },
     createdAt: { type: Date, default: Date.now },
