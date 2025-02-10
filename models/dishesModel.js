@@ -4,7 +4,7 @@ const DishesSchema = new mongoose.Schema({
    // dish_id: { type: String, required: true },
     restaurant_id: { type: mongoose.Schema.Types.ObjectId, ref: "resturant", required: true},
     name: { type: String, required: true },
-   // image: { type: String },
+   image: { type: [String] },
     rating: { type: Number },
     price: { type: Number, required: true },
     description: { type: String },

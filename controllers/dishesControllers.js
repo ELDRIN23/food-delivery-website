@@ -3,12 +3,12 @@ import { Dishes } from "../models/dishesModel.js";
 // Add a new dish
 export const addDish = async (req, res) => {
     try {
-        const {restaurant_id, name,  rating, price, description, availability } = req.body;
+        const {restaurant_id, name,  rating, price, description, availability,image } = req.body;
 
         const newDish = new Dishes({
             restaurant_id,
             name,
-           // image,
+           image,
             rating,
             price,
             description,
