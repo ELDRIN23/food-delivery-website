@@ -25,6 +25,8 @@ export const addDish = async (req, res) => {
 // Get all dishes
 export const getAllDishes = async (req, res) => {
     try {
+        // console.log("hitted");
+        
         const dishes = await Dishes.find();
         res.status(200).json(dishes);
     } catch (error) {
