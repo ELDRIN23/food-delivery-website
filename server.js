@@ -17,12 +17,13 @@ app.use(express.json());
 const port = process.env.PORT || 3001; // Use environment variable or fallback to 3000
 
 // cloudinaryInstance()
-app.use(cookieParser());
 app.use(cors({
-  origin:"http://localhost:5173",
-  methods:["GET","PUT","POST","DELETE","OPTIONS"],
-  credentials:true,
+  origin: "http://localhost:5174",
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  credentials: true
 }));
+
 
 // Connect to Database
 connectDB();
