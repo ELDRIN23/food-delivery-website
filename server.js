@@ -18,12 +18,13 @@ const port = process.env.PORT || 3005; // Use environment variable or fallback t
 
 // cloudinaryInstance()
 app.use(cors({
-  origin: "http://localhost:5174",
+  origin: "http://localhost:5173",
   methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   credentials: true
 }));
 
+// app.use('/uploads', express.static('uploads'));
 
 // Connect to Database
 connectDB();

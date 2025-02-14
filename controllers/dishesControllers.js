@@ -81,18 +81,18 @@ export const deleteDish = async (req, res) => {
 };
 
 //Dish details
-export const getDishDetails = async (req, res) => {
-    try {
-        const { id } = req.params;
-        console.log(id);
-        const dish = await Dishes.findById(id);
+// export const getDishDetails = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         console.log(id);
+//         const dish = await Dishes.findById(id);
         
-        if (!dish) {
-            return res.status(404).json({ message: "Dish not found" });
-        }
+//         if (!dish) {
+//             return res.status(404).json({ message: "Dish not found" });
+//         }
 
-        res.status(200).json(dish);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch dish details", details: error.message });
-    }
-};
+//         res.status(200).json(dish);
+//     } catch (error) {
+//         res.status(500).json({ error: "Failed to fetch dish details", details: error.message });
+//     }
+// };

@@ -5,7 +5,7 @@ import {
     getDishesByRestaurant,
     updateDish,
     deleteDish,
-    getDishDetails,
+    // getDishDetails,
 } from "../controllers/dishesControllers.js";
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.post('/add', addDish);
 router.get('/', getAllDishes);
 
 //get dish details
-router.get("/dishDetails/:id", getDishDetails);
+// router.get("/dishDetails/:id", getDishDetails);
 
 // Get dishes by restaurant ID
 router.get('/:restaurant_id', getDishesByRestaurant);
