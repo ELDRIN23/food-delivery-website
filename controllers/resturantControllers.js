@@ -1,7 +1,7 @@
 import Restaurant from "../models/resturantModel.js";
 import { createCookies } from "../utils/cookies.js";
 import { generateToken } from "../utils/token.js";
-import { cloudinaryInstance } from "../config/cloudinaryConfig.js";
+
 
 // Add a new restaurant
 export const addRestaurant = async (req, res) => {

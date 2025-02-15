@@ -7,11 +7,12 @@ import {
     deleteDish,
     // getDishDetails,
 } from "../controllers/dishesControllers.js";
+import { processUpload } from "../config/cloudinaryConfig.js";
 
 const router = express.Router();
 
 // Add a new dish
-router.post('/add', addDish);
+router.post('/add',processUpload, addDish);
 
 // Get all dishes
 router.get('/', getAllDishes);

@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from 'cors';
-import { cloudinaryInstance } from "./config/cloudinaryConfig.js";
 //import {apiRouter}from "./routes/userRoutes.js"
 const app = express();
 dotenv.config();
@@ -14,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json());
 
-const port = process.env.PORT || 3005; // Use environment variable or fallback to 3000
+const port = process.env.PORT || 5001; // Use environment variable or fallback to 3000
 
 // cloudinaryInstance()
 app.use(cors({
@@ -29,7 +28,7 @@ app.use(cors({
 // Connect to Database
 connectDB();
 
-// Routes
+// Route API
 app.use("/api", apiRouter);
 
 
