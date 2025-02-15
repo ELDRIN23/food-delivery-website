@@ -56,7 +56,7 @@ export const processUpload = (req, res, next) => {
     }
     // If no file is uploaded, just proceed to the next middleware
     if (!req.file) {
-      console.log("No file uploaded, proceeding without image.");
+      // console.log("No file uploaded, proceeding without image.");
       req.cloudinaryResult = null; // Ensure it’s explicitly null, not undefined
       return next();
     }
